@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>water</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+        context.strokeStyle='maroon';
+        context.lineWidth=4;
+        
+        
+        // setLineDash = 虚线
+        context.save();
+        context.setLineDash([30,60,90]);
+        // 虚线偏移
+        context.moveTo(50, 100);
+        context.lineTo(700, 100);
+        context.stroke();
+        context.restore();
+        
+        // setLineDash = 虚线
+        context.save();
+        context.setLineDash([60]);
+        // 虚线偏移
+        context.moveTo(50, 200);
+        context.lineTo(700, 200);
+        context.stroke();
+        context.restore();
+
+        // setLineDash = 虚线
+        context.save();
+        context.setLineDash([60]);
+        context.lineDashOffset=-90;
+        
+        // 虚线偏移
+        context.moveTo(50, 300);
+        context.lineTo(700, 300);
+        context.stroke();
+        context.restore();
+        
+        
+    </script>
+</body>
+</html>

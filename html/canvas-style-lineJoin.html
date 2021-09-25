@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>water</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+
+        // 拐角类型 lineJoin miter round bevel
+        context.strokeStyle='maroon';
+        context.lineWidth=40;
+        context.save();
+        context.lineJoin = 'miter'
+        context.miterLimit=4;
+        
+        context.beginPath();
+        context.moveTo(50, 50);
+        context.lineTo(400, 50);
+        context.lineTo(200, 150);
+        context.stroke();
+        context.restore();
+
+        context.save();
+        context.lineJoin = 'round'
+        context.beginPath();
+        context.moveTo(50, 250);
+        context.lineTo(400, 250);
+        context.lineTo(200, 350);
+        context.stroke();
+        context.restore();
+
+        context.save();
+        context.lineJoin = 'bevel'
+        context.beginPath();
+        context.moveTo(50, 450);
+        context.lineTo(400, 450);
+        context.lineTo(200, 550);
+        context.stroke();
+        context.restore();
+
+        // miterLimit 
+        // 当lineJoin为miter时，如果拐角过小 拐角的厚度就会过大
+        // 那设置ctx.miterLimit = 1就可以避免
+        
+        
+    </script>
+</body>
+</html>

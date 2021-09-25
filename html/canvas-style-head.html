@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>water</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+        // context.strokeStyle='maroon';
+        context.lineWidth=4;
+        const colors = ['red', 'yellow']
+        
+        function draw () {
+            context.save();
+            context.translate(300,400);
+            context.beginPath();
+            context.moveTo(0,0);
+            context.bezierCurveTo(-200,-50,-180,-300,0,-200);
+            context.bezierCurveTo(180,-300,200,-50,0,0);
+            context.setLineDash([30])
+
+            context.lineWidth = 10;
+            context.strokeStyle=colors[0];
+            context.stroke();
+            // context.restore();
+
+            context.strokeStyle=colors[1];
+            context.lineDashOffset = 30;
+            context.shadowColor='orange';
+            for (let i = 50; i>5; i-=5) {
+                context.shadowBlur=i;
+                context.stroke();
+            }
+            
+            
+
+            context.restore();
+        }
+        draw();
+
+        setInterval(() => {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            colors.reverse()
+            draw()
+        }, 500)
+        
+        
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>water</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+
+        // 描边区 strokeStyle == stroke()、strokeRect() strokeText()
+        // 填充区域 fillstyle == fill() 、 fillRect() 、fillText()
+
+        // 着色 
+        // 1、纯色 blue #00acec rgba(255, 0, 0, 0.5) rgb(255,0,0)
+        // 2、渐变  
+        // 1) 定义渐变对象
+        //       线性渐变 gradient=createLinearGradient(x1,y1,x2,y2)
+        //       径向渐变 gradient=createRadiaGradient(x1,y1,r1,x2,y2,r2)
+        // 2)  定义渐变颜色节点
+        //       gradient.addColorStop(position, color)
+        // 3)  赋值
+        //       context.fillStyle = gradient
+        //       context.strokeStyle = gradient  
+        // radia-gradient
+        const gr = context.createRadialGradient(
+            300, 300, 10,
+            250, 250, 200
+        );
+        gr.addColorStop(0, 'red');
+        gr.addColorStop(0.5, 'yellow');
+        gr.addColorStop(1, '#00acec');
+        context.fillStyle=gr;
+        context.fillRect(50,50, 600,600);
+        
+        // 纹理着色
+        
+        
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>water</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+        context.strokeStyle='maroon';
+        context.lineWidth=4;
+        // 投影 偏移 shadowOffsetX = float
+        // 投影 偏移 shadowOffsetY = float
+        // 投影 模糊 shadowBlur = float
+        // 投影 颜色 shadowColor = color
+        context.shadowColor='#000';
+        context.shadowOffsetX=30;
+        context.shadowOffsetY=30;
+        context.shadowBlur=30;
+        
+        
+        context.beginPath();
+        context.arc(200, 200, 100, 0, Math.PI * 2);
+        context.fillStyle = '#00acec';
+        context.fill();
+        
+        
+        
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>water</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+
+        // 纹理
+        // 1）创建纹理对象
+        // pattern = context.createPattern(image, 'repeat|repeat-x|repeat-y|no-repeat')
+          
+        // 为着色样式赋值
+        // context.fillStyle = pattern
+        // context.strokeStyle = pattern
+        
+        const img = new Image()
+        img.onload = function(image) {
+            const pt = context.createPattern(img, 'repeat');
+            context.fillStyle=pt;
+            context.fillRect(0,0,canvas.width,canvas.height);
+        }
+        img.src = './zuan.jpeg'
+        // 
+    </script>
+</body>
+</html>
