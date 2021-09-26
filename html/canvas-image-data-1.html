@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>image-像素</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+
+        const len = 8
+        const size = 256 // 小图的匡高
+        let fm = 0 // 多长时间显示
+        const image = new Image()
+        image.src = './images/boom.jpg'
+        image.onload = draw
+        function draw() {
+            context.drawImage(
+                image, 
+                fm*size, 0, size, size,
+                0, 0, size, size
+                );
+            setTimeout(function () {
+                fm++;
+                if (fm === len) {
+                    fm = 0;
+                }
+                draw()
+            }, 100)
+        }
+    </script>
+</body>
+</html>

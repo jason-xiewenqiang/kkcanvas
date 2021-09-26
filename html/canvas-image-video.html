@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>text</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <video id="vid" controls autoplay loop muted>
+        <source src="./images/te.mp4" type="video/mp4">
+    </video>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = 400;
+        canvas.height = 285;
+        const context = canvas.getContext('2d');
+
+        let interval = null
+        const vid = document.getElementById('vid')
+        vid.addEventListener('play', function () {
+            interval = setInterval(() => {
+                context.drawImage(vid, 0, 0);
+            }, 40)
+        })
+        // 渲染效率
+        vid.addEventListener('pause', function() {
+            clearInterval(interval)
+        })
+    </script>
+</body>
+</html>

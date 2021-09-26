@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>text</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+        // drawImage(image, x, y)
+        const img = new Image()
+        img.onload = function () {
+            const { width, height } = img
+            // context.drawImage(img, 100, 100, width * 1.5, height);
+            // 移动 如下
+            // context.drawImage(img, - width / 2, - width / 2, width, height, 0, 0, width, height);
+            // 缩小 如下
+            // context.drawImage(img, width / 2, height / 2, width/2, height/2, 0, 0, width, height);
+            // 视图移动
+            // context.drawImage(img, width / 2, height / 2, width, height, 100, 100, width, height);
+            // 裁剪
+            context.drawImage(img, 0, 0, width, height, 100, 100, width / 2, height / 2);
+        }
+        img.src = './images/cat7.jpeg'
+
+        // 绘图裁剪 drawImage(image, x1, y1, w1, h1, x2, y2, w2, h2)
+
+
+        
+    </script>
+</body>
+</html>

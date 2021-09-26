@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>text</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+
+        context.fillStyle='#999';
+        context.setLineDash([8]);
+        context.moveTo(300, 50);
+        context.lineTo(300, 600);
+        context.stroke();
+        context.font = '24px serif';
+        
+        context.textAlign='start';
+        context.fillText('Start', 300, 100);
+
+        context.textAlign='end';
+        context.fillText('End', 300, 100);
+
+        context.textAlign='left';
+        context.fillText('Left', 300, 200);
+        
+        context.textAlign='right';
+        context.fillText('Right', 300, 200);
+        
+        context.textAlign='center';
+        context.fillText('Center', 300, 150);
+        
+        
+        
+    </script>
+</body>
+</html>

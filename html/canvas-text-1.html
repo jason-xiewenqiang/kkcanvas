@@ -11,7 +11,7 @@
             overflow: hidden;
         }
         #canvas {
-            background-color: #000;
+            background-color: #fff;
         }
     </style>
 </head>
@@ -23,6 +23,15 @@
         canvas.height = window.innerHeight;
         const context = canvas.getContext('2d');
 
+        // 文本属性 
+        /**
+         * 字体：font
+         * 水平对齐：textAlign
+         * 垂直 textBaseline
+        */
+        context.font = '700 100px arail';
+        context.fillStyle = '#00acec';
+        context.fillText('hello world', 100, 100);
     </script>
 </body>
 </html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字布艺效果</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #canvas {
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const context = canvas.getContext('2d');
+        context.font='800 200px sans-serif';
+        context.fillStyle='#a76921';
+        context.shadowColor='rgba(0,0,0,0.6)';
+        context.shadowOffsetY=3;
+        context.shadowBlur=4;
+        
+        
+        const text = 'Canvas'
+        const [x, y] = [50, 200]
+        context.fillText(text, x, y);
+        context.strokeStyle='#f0d5ac';
+        context.lineWidth=8;
+        context.strokeText(text, x, y);
+
+        context.strokeStyle='#333';
+        context.lineWidth=1;
+        context.setLineDash([5, 3]);
+        context.strokeText(text, x, y);
+        context.shadowColor='rgba(0,0,0,0.6)';
+        context.shadowOffsetY=3;
+        
+    </script>
+</body>
+
+</html>
