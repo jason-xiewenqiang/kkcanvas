@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pattern</title>
+    <style>
+      body {
+        background-color: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="can"></canvas>
+    <script>
+      const canvas = document.getElementById("can");
+      const context = canvas.getContext("2d");
+      canvas.width = 600;
+      canvas.height = 600;
+
+      const moveToFunction = CanvasRenderingContext2D.prototype.moveTo;
+      CanvasRenderingContext2D.prototype.lastMoveToLocation = {};
+
+      CanvasRenderingContext2D.prototype.moveTo = function (x, y) {
+        moveToFunction.apply(context, [x, y]);
+        this.lastMoveToLocation.x = x;
+        this.lastMoveToLocation.y = y;
+      };
+      CanvasRenderingContext2D.prototype.dashedLineTo = function (
+        x,
+        y,
+        dashedLength
+      ) {
+        dashedLength = dashedLength === undefined ? 5 : dashedLength;
+        let startX = this.lastMoveToLocation.x;
+        let startY = this.lastMoveToLocation.y;
+        let deltaX = x - startX;
+        let deltaY = y - startY;
+        let numDashes = Math.floor(
+          Math.sqrt(deltaX * deltaX + deltaY * deltaY) / dashedLength
+        );
+        for (let i = 0; i < numDashes; ++i) {
+          this[i % 2 === 0 ? "moveTo" : "lineTo"](
+            startX + (deltaX / numDashes) * i,
+            startY + (deltaY / numDashes) * i
+          );
+        }
+        this.moveTo(x, y);
+      };
+      context.lineWidth = 3;
+      context.strokeStyle = "blue";
+      context.moveTo(20, 20);
+      context.dashedLineTo(canvas.width - 20, 20);
+      context.dashedLineTo(canvas.width - 20, canvas.height - 20);
+      context.dashedLineTo(20, canvas.height - 20);
+      context.dashedLineTo(20, 20);
+      context.dashedLineTo(canvas.width - 20, canvas.height - 20);
+      context.stroke();
+    </script>
+  </body>
+</html>

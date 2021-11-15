@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rect</title>
+  </head>
+  <body>
+    <canvas id="can"></canvas>
+    <script>
+      const canvas = document.getElementById("can");
+      const context = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      // clearRect(x,y,width,height)
+      // strokeRect(x,y,width,height)
+      // fillRect(x,y,width,height)
+      context.lineJoin = "round";
+      context.lineWidth = 30;
+      context.font = "24px sans-serif";
+      context.fillText("Click Me", 175, 40);
+      context.fillStyle = "rgba(0,0,0,0.5)";
+      context.strokeStyle = "goldenrod";
+
+      context.strokeRect(75, 100, 200, 200);
+      context.fillRect(325, 100, 200, 200);
+      context.canvas.onmousedown = function (e) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      };
+    </script>
+  </body>
+</html>

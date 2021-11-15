@@ -19,3 +19,15 @@
 // 正切 - tangent : tan(θ)  = 对边 / 邻边
 
 // 2-3. 向量运算
+// 任何直角三角形的斜边，等于另外两边的平方根
+const vectorMagnitude = Math.sqrt(
+  Math.pow(vector.x, 2) + Math.pow(vector.y, 2)
+);
+
+// 2-3-1 单位向量 （unit vector）长度永远是 1
+const vectorMagnitude = Math.sqrt(
+  Math.pow(vector.x, 2) + Math.pow(vector.y, 2)
+);
+const unitVector = new Vector();
+unitVector.x = vector.x / vectorMagnitude;
+unitVector.y = vector.y / vectorMagnitude;

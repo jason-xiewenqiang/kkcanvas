@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pattern</title>
+  </head>
+  <body>
+    <canvas id="can"></canvas>
+    <script>
+      const canvas = document.getElementById("can");
+      const context = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const image = new Image();
+      function fillCanvasWidthPattern() {
+        const pattern = context.createPattern(image, "repeat");
+        context.fillStyle = pattern;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fill();
+      }
+      image.src = "./pig.jpeg";
+      image.onload = () => {
+        fillCanvasWidthPattern();
+      };
+    </script>
+  </body>
+</html>

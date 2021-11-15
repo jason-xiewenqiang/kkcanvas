@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pattern</title>
+    <style>
+      body {
+        background-color: #eee;
+      }
+      #control {
+        position: absolute;
+        left: 25px;
+        top: 25px;
+      }
+      #can {
+        background-color: #fff;
+        cursor: pointer;
+        margin-left: 10px;
+        margin-top: 10px;
+        box-sizing: 4px 4px 8px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="can"></canvas>
+    <div id="control">
+      <select id="strokeStyleSelect">
+        <option value="red">red</option>
+        <option value="green">green</option>
+        <option value="blue">blue</option>
+        <option value="navy">navy</option>
+        <option value="orange" selected>orange</option>
+        <option value="purple">purple</option>
+      </select>
+      <input id="guidewireCheckbox" type="checkbox" checked />
+      <input id="fillCheckbox" type="checkbox" checked />
+      <input id="eraseAllButton" type="button" value="Erase all" />
+    </div>
+    <script>
+      const canvas = document.getElementById("can");
+      const context = canvas.getContext("2d");
+      canvas.width = 600;
+      canvas.height = 400;
+
+      const eraseAllButton = document.getElementById("eraseAllButton");
+      const guidewireCheckbox = document.getElementById("guidewireCheckbox");
+      const strokeStyleSelect = document.getElementById("strokeStyleSelect");
+      const fillCheckbox = document.getElementById("fillCheckbox");
+      let drawingSurfaceImageData;
+      const mousedown = {};
+      const rubberbandRect = {};
+      let dragging = false;
+      let guiwires = guidewireCheckbox.checked;
+
+      function drawGrid(color, stepx, stepy) {
+        context.strokeStyle = color;
+        context.lineWidth = 0.5;
+        for (let i = stepx + 0.5; i < canvas.width; i += stepx) {
+          context.beginPath();
+          context.moveTo(i, 0);
+          context.lineTo(i, canvas.height);
+          context.stroke();
+        }
+        for (let i = stepy + 0.5; i < canvas.height; i += stepy) {
+          context.beginPath();
+          context.moveTo(0, i);
+          context.lineTo(canvas.width, i);
+          context.stroke();
+        }
+      }
+
+      function windowToCanvas(x, y) {
+        const bbox = canvas.getBoundingClientRect();
+        return {
+          x: x - bbox.left * (canvas.width / bbox.width),
+          y: y - bbox.top * (canvas.height / bbox.height),
+        };
+      }
+
+      function saveDrawingSurface() {
+        drawingSurfaceImageData = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+      }
+
+      function restoreDrawingSurface() {
+        context.putImageData(drawingSurfaceImageData, 0, 0);
+      }
+
+      function updateRubberbandRect(loc) {
+        rubberbandRect.width = Math.abs(loc.x - mousedown.x);
+        rubberbandRect.height = Math.abs(loc.y - mousedown.y);
+        if (loc.x > mousedown.x) {
+          rubberbandRect.left = mousedown.x;
+        } else {
+          rubberbandRect.left = loc.x;
+        }
+        if (loc.y > mousedown.y) {
+          rubberbandRect.top = mousedown.y;
+        } else {
+          rubberbandRect.top = loc.y;
+        }
+      }
+
+      // function drawRubberbandShape(loc) {
+      //   context.beginPath();
+      //   context.moveTo(mousedown.x, mousedown.y);
+      //   context.lineTo(loc.x, loc.y);
+      //   context.stroke();
+      // }
+      function drawRubberbandShape(loc) {
+        let angle;
+        let radius;
+        if (mousedown.y === loc.y) {
+          radius = Math.abs(loc.x - mousedown.x);
+        } else {
+          angle = Math.atan(rubberbandRect.height / rubberbandRect.width);
+          radius = rubberbandRect.height / Math.sin(angle);
+        }
+        context.beginPath();
+        context.arc(mousedown.x, mousedown.y, radius, 0, Math.PI * 2, false);
+        if (fillCheckbox.checked) {
+          context.fill();
+        }
+      }
+
+      function updateRubberband(loc) {
+        updateRubberbandRect(loc);
+        drawRubberbandShape(loc);
+      }
+
+      function drawHorizontalLine(y) {
+        context.beginPath();
+        context.moveTo(0, y + 0.5);
+        context.lineTo(canvas.width, y + 0.5);
+        context.stroke();
+      }
+
+      function drawVerticalLine(x) {
+        context.beginPath();
+        context.moveTo(x + 0.5, 0);
+        context.lineTo(x + 0.5, canvas.height);
+        context.stroke();
+      }
+      function drawGuidewires(x, y) {
+        context.save();
+        context.strokeStyle = "rgba(0,0,230,0.4)";
+        context.lineWidth = 0.5;
+        drawVerticalLine(x);
+        drawHorizontalLine(y);
+        context.restore();
+      }
+
+      canvas.onmousedown = function (e) {
+        let loc = windowToCanvas(e.clientX, e.clientY);
+        e.preventDefault();
+        saveDrawingSurface();
+        mousedown.x = loc.x;
+        mousedown.y = loc.y;
+        dragging = true;
+      };
+
+      canvas.onmousemove = function (e) {
+        let loc;
+        if (dragging) {
+          e.preventDefault();
+          loc = windowToCanvas(e.clientX, e.clientY);
+          restoreDrawingSurface();
+          updateRubberband(loc);
+          if (guiwires) {
+            drawGuidewires(loc.x, loc.y);
+          }
+        }
+      };
+      canvas.onmouseup = function (e) {
+        const loc = windowToCanvas(e.clientX, e.clientY);
+        restoreDrawingSurface();
+        updateRubberband(loc);
+        dragging = false;
+      };
+
+      eraseAllButton.onclick = function (e) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid("lightgray", 10, 10);
+        saveDrawingSurface();
+      };
+
+      strokeStyleSelect.onchange = function () {
+        context.strokeStyle = strokeStyleSelect.value;
+      };
+
+      guidewireCheckbox.onchange = function () {
+        guiwires = guidewireCheckbox.checked;
+      };
+      context.strokeStyle = strokeStyleSelect.value;
+
+      drawGrid("lightgray", 10, 10);
+    </script>
+  </body>
+</html>
