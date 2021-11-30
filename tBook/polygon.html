@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pattern</title>
+  </head>
+  <body>
+    <canvas id="can"></canvas>
+    <script>
+      const canvas = document.getElementById("can");
+      const context = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      function drawGrid(color, stepx, stepy) {
+        context.save();
+        context.strokeStyle = color;
+        context.lineWidth = 0.5;
+        for (let i = stepx + 0.5; i < canvas.width; i += stepx) {
+          context.beginPath();
+          context.moveTo(i, 0);
+          context.lineTo(i, canvas.height);
+          context.stroke();
+        }
+        for (let i = stepy + 0.5; i < canvas.height; i += stepy) {
+          context.beginPath();
+          context.moveTo(0, i);
+          context.lineTo(canvas.width, i);
+          context.stroke();
+        }
+        context.fillStyle = "rgba(100,140,230,0.5)";
+        context.strokeStyle = "rgba(100,140,230,0.5)";
+        context.restore();
+      }
+      drawGrid("lightgray", 20, 20);
+
+      
+    </script>
+  </body>
+</html>

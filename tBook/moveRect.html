@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>移动多边形</title>
+  </head>
+  <body>
+    <button id="eraseAllButton">eraseAllButton</button>
+    <select id="startAngleSelect">
+      <option value="30">30</option>
+      <option value="60">60</option>
+      <option value="90">90</option>
+    </select>
+    <select id="strokeStyleSelect">
+      <option value="block">黑</option>
+      <option value="pink">粉</option>
+      <option value="blue">蓝</option>
+    </select>
+    <select id="fillStyleSelect">
+      <option value="red" selected>红</option>
+      <option value="green">绿</option>
+      <option value="orange">黄</option>
+    </select>
+    <input id="fillCheckbox" type="checkbox" name="填充" checked/>
+    <input id="editCheckbox" type="checkbox" name="编辑" checked/>
+    <select id="sidesSelect">
+      <option label="6" value="6" selected></option>
+      <option label="7" value="7" ></option>
+      <option label="8" value="8" ></option>
+    </select>
+    <canvas id="can"></canvas>
+    <script src="polygon.js"></script>
+    <script>
+      const canvas = document.getElementById("can");
+      const eraseAllButton = document.getElementById("eraseAllButton");
+      const strokeStyleSelect = document.getElementById("strokeStyleSelect");
+      const startAngleSelect = document.getElementById("startAngleSelect");
+      const fillStyleSelect = document.getElementById("fillStyleSelect");
+      const fillCheckbox = document.getElementById("fillCheckbox");
+      const editCheckbox = document.getElementById("editCheckbox");
+      const sidesSelect = document.getElementById("sidesSelect");
+
+      let drawingSuffaceImageData;
+      const mouseDown = {};
+      const rubberbandRect = {};
+      let dragging = false;
+      let draggingOffsetX;
+      let dragginOffsetY;
+
+      let sides = 8;
+      let startAngle = 0;
+
+      let guidewire = true;
+      let editing = false;
+      let polygons = [];
+
+      const context = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      function drawGrid(color, stepx, stepy) {
+        context.save();
+        context.strokeStyle = color;
+        context.lineWidth = 0.5;
+        for (let i = stepx + 0.5; i < canvas.width; i += stepx) {
+          context.beginPath();
+          context.moveTo(i, 0);
+          context.lineTo(i, canvas.height);
+          context.stroke();
+        }
+        for (let i = stepy + 0.5; i < canvas.height; i += stepy) {
+          context.beginPath();
+          context.moveTo(0, i);
+          context.lineTo(canvas.width, i);
+          context.stroke();
+        }
+      }
+      
+
+      function windowToCanvas(x, y) {
+        const { left, top, width, height } = canvas.getBoundingClientRect();
+        return {
+          x: x - left * (canvas.width / width),
+          y: y - top * (canvas.height / height),
+        };
+      }
+
+      function saveDrawingSurface() {
+        drawingSuffaceImageData = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+      }
+
+      function restoreDrawingSurface() {
+        context.putImageData(drawingSuffaceImageData, 0, 0);
+      }
+
+      function drawPolygon(polygon) {
+        context.beginPath();
+        polygon.createPath(context);
+        polygon.stroke(context);
+        if (fillCheckbox.checked) {
+          polygon.fill(context);
+        }
+      }
+
+      function updateRubberbandRectangle(loc) {
+        rubberbandRect.width = Math.abs(loc.x - mouseDown.x);
+        rubberbandRect.height = Math.abs(loc.y - mouseDown.y);
+        if (loc.x > mouseDown.x) {
+          rubberbandRect.left = mouseDown.x;
+        } else {
+          rubberbandRect.left = loc.x;
+        }
+        if (loc.y > mouseDown.y) {
+          rubberbandRect.top = mouseDown.y;
+        } else {
+          rubberbandRect.top = loc.y;
+        }
+      }
+
+      function drawRubberbandShape(loc, sides, startAngle) {
+        const polygon = new Polygon(
+          {
+            centerX: mouseDown.x,
+            centerY: mouseDown.y,
+            radius: rubberbandRect.width,
+            sides: parseInt(sidesSelect.value),
+            startAngle: (Math.PI / 180) * parseInt(startAngleSelect.value),
+            strokeStyle: context.strokeStyle,
+            fillStyle: context.fillStyle,
+            filled: fillCheckbox.checked
+          }
+        );
+        drawPolygon(polygon);
+        if (!dragging) {
+          polygons.push(polygon);
+        }
+      }
+
+      function updateRubberband(loc, sides, startAngle) {
+        updateRubberbandRectangle(loc);
+        drawRubberbandShape(loc, sides, startAngle);
+      }
+
+      function drawHorizontalLine(y) {
+        context.beginPath();
+        context.moveTo(0, y + 0.5);
+        context.lineTo(canvas.width, y + 0.5);
+        context.stroke();
+      }
+
+      function drawVerticalLine(x) {
+        context.beginPath();
+        context.moveTo(x + 0.5, 0);
+        context.lineTo(x + 0.5, canvas.height);
+        context.stroke();
+      }
+
+      function drawGuidewires(x, y) {
+        context.save();
+        context.strokeStyle = "rgba(0,0,230,0.4)";
+        context.lineWidth = 0.5;
+        drawVerticalLine(x);
+        drawHorizontalLine(y);
+        context.restore();
+      }
+
+      function drawPolygons() {
+        polygons.forEach((polygon) => {
+          drawPolygon(polygons);
+        });
+      }
+
+      function startDragging(loc) {
+        saveDrawingSurface();
+        mouseDown.x = loc.x;
+        mouseDown.y = loc.y;
+      }
+
+      function startEditing() {
+        canvas.style.cursor = "pointer";
+        editing = true;
+      }
+
+      function stopEditing() {
+        canvas.style.cursor = "crosshair";
+        editing = false;
+      }
+
+      canvas.onmousedown = function (e) {
+        const loc = windowToCanvas(e.clientX, e.clientY);
+        e.preventDefault();
+        if (editing) {
+          polygons.forEach((polygon) => {
+            polygon.createPath(context);
+            if (context.isPointInPath(polygon.x, polygon.y)) {
+              startDragging(loc);
+              dragging = polygon;
+              draggingOffsetX = loc.x - polygon.x;
+              dragginOffsetY = loc.y - polygon.y;
+              return;
+            }
+          });
+        } else {
+          startDragging(loc);
+          dragging = true;
+        }
+      };
+      canvas.onmousemove = function (e) {
+        const loc = windowToCanvas(e.clientX, e.clientY);
+        e.preventDefault();
+        if (editing && dragging) {
+          dragging.x = loc.x - mouseDown.x;
+          dragging.y = loc.y - mouseDown.y;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          drawGrid("lightgray", 20, 20);
+          drawPolygons();
+        } else {
+          if (dragging) {
+            restoreDrawingSurface();
+            updateRubberband(loc, sides, startAngle);
+            if (guidewire) {
+              drawGuidewires(mouseDown.x, mouseDown.y);
+            }
+          }
+        }
+      };
+
+      canvas.onmouseup = function (e) {
+        const loc = windowToCanvas(e.clientX, e.clientY);
+        dragging = false;
+        if (editing) {
+        } else {
+          restoreDrawingSurface();
+          updateRubberband(loc);
+        }
+      };
+
+      eraseAllButton.onclick = function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid("lightgray", 20, 20);
+        saveDrawingSurface();
+      };
+      strokeStyleSelect.onchange = function () {
+        context.strokeStyle = strokeStyleSelect.value;
+      };
+      fillStyleSelect.onchange = function () {
+        context.fillStyle = fillStyleSelect.value;
+      };
+      editCheckbox.onchange = function () {
+        if (editCheckbox.checked) {
+          startEditing();
+        } else {
+          stopEditing();
+        }
+      };
+
+      context.strokeStyle = strokeStyleSelect.value;
+      context.fillStyle = fillStyleSelect.value;
+      context.shadowColor = "rgba(0,0,0, 0.4)";
+      context.shadowOffsetX = 2;
+      context.shadowOffsetY = 2;
+      context.shadowBlur = 4;
+
+      drawGrid("lightgray", 20, 20);
+    </script>
+  </body>
+</html>
