@@ -1,5 +1,6 @@
 const http = require("http");
 const fs = require("fs");
+const url = require('url');
 const dirName = "albums";
 
 const makeError = (err, msg) => {
@@ -114,7 +115,7 @@ const getAlbumList = (req, res) => {
 
 // 处理请求的类型
 const hander = (req, res) => {
-  console.log(`incoming request: ${req.method} ${req.url}`);
+  console.log(`incoming request: ${req.method} ${req.url} \n`, url.parse(req.url));
   if (req.url === "/albums.json") {
     console.log(1);
     getAlbumList(req, res);
