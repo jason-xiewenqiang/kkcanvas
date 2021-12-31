@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Axis</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script src="../tools.js"></script>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const HORIZONTAL_AXIS_MARGIN = 50;
+      const VERTICAL_AXIS_MARGIN = 50;
+      const AXIS_ORIGIN = {
+        x: HORIZONTAL_AXIS_MARGIN,
+        y: canvas.height - VERTICAL_AXIS_MARGIN,
+      };
+      console.log(canvas.height);
+      const AXIS_TOP = VERTICAL_AXIS_MARGIN;
+      const AXIS_RIGHT = canvas.width - HORIZONTAL_AXIS_MARGIN;
+      const HORIZONTAL_TICK_SPACING = 10;
+      const VERTICAL_TICK_SPACING = 10;
+      const AXIS_WIDTH = AXIS_RIGHT - AXIS_ORIGIN.x;
+      const AXIS_HEIGHT = AXIS_ORIGIN.y - AXIS_TOP;
+      const NUM_VERTICAL_TICKS = AXIS_HEIGHT / VERTICAL_TICK_SPACING;
+      const NUM_HORIZONTAL_TICKS = AXIS_WIDTH / HORIZONTAL_TICK_SPACING;
+      const TICK_WIDTH = 10;
+      const SPACE_BETWEEN_LABELS_ADD_AXIS = 20;
+
+      function drawAxis() {
+        context.save();
+        context.lineWidth = 1.0;
+        context.fillStyle = 'rgba(100, 140, 230, 0.8)';
+        context.strokeStyle = 'navy';
+
+        drawHorizontalAxis();
+        drawVerticalAxis();
+
+        context.lineWidth = 0.5;
+        context.strokeStyle = 'darkred';
+
+        drawVerticalTicks();
+        drawHorizontalTicks();
+        context.restore();
+      }
+      function drawHorizontalAxis() {
+        context.beginPath();
+        context.moveTo(AXIS_ORIGIN.x, AXIS_ORIGIN.y);
+        context.lineTo(AXIS_RIGHT, AXIS_ORIGIN.y);
+        context.stroke();
+      }
+      function drawVerticalAxis() {
+        context.beginPath();
+        context.moveTo(AXIS_ORIGIN.x, AXIS_ORIGIN.y);
+        context.lineTo(AXIS_ORIGIN.x, AXIS_TOP);
+        context.stroke();
+      }
+      function drawVerticalTicks() {
+        let dataX;
+        for (let i = 1; i < NUM_VERTICAL_TICKS; i++) {
+          context.beginPath();
+          if (i % 5) {
+            dataX = TICK_WIDTH / 2;
+          } else {
+            dataX = TICK_WIDTH;
+          }
+          context.moveTo(AXIS_ORIGIN.x - dataX, AXIS_ORIGIN.y - i * VERTICAL_TICK_SPACING);
+          context.lineTo(AXIS_ORIGIN.x + dataX, AXIS_ORIGIN.y - i * VERTICAL_TICK_SPACING);
+          context.stroke();
+        }
+      }
+      function drawHorizontalTicks() {
+        let dataX;
+        for (let i = 1; i < NUM_HORIZONTAL_TICKS; i++) {
+          context.beginPath();
+          if (i % 5) {
+            dataX = TICK_WIDTH / 2;
+          } else {
+            dataX = TICK_WIDTH;
+          }
+          context.moveTo(AXIS_ORIGIN.x + i * HORIZONTAL_TICK_SPACING, AXIS_ORIGIN.y - dataX);
+          context.lineTo(AXIS_ORIGIN.x + i * HORIZONTAL_TICK_SPACING, AXIS_ORIGIN.y + dataX);
+          context.stroke();
+        }
+      }
+
+      function drawAxisLabels() {
+        context.fillStyle = 'blue';
+        drawVerticalLabels();
+        drawHorizontalLabels();
+      }
+
+      function drawVerticalLabels() {
+        context.textAlign = 'center';
+        context.textBaseline = 'top';
+        // console.log(1);
+        console.log(NUM_HORIZONTAL_TICKS);
+        for (let i = 0; i <= NUM_HORIZONTAL_TICKS; i++) {
+          console.log(123);
+          if (i % 5 === 0) {
+            context.fillText(
+              i,
+              AXIS_ORIGIN.x + i * HORIZONTAL_TICK_SPACING,
+              AXIS_ORIGIN.y + SPACE_BETWEEN_LABELS_ADD_AXIS
+            );
+          }
+        }
+      }
+
+      function drawHorizontalLabels() {
+        context.textAlign = 'right';
+        context.textBaseline = 'middle';
+        for (let i = 0; i < NUM_VERTICAL_TICKS; i++) {
+          if (i % 5 === 0) {
+            context.fillText(
+              i,
+              AXIS_ORIGIN.x - SPACE_BETWEEN_LABELS_ADD_AXIS,
+              AXIS_ORIGIN.y - i * VERTICAL_TICK_SPACING
+            );
+          }
+        }
+      }
+
+      context.font = '13px Arial';
+
+      drawGrid('lightGray', 10, 10);
+
+      context.shadowColor = 'rgba(100, 140, 230, 0.8)';
+      context.shadowOffsetX = 3;
+      context.shadowOffsetY = 3;
+      context.shadowBlur = 5;
+
+      drawAxis();
+      drawAxisLabels();
+    </script>
+  </body>
+</html>

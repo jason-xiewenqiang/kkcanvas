@@ -6,7 +6,6 @@ const app = express();
 app.get('/', function (req, res) {
   res.end('hello world');
 });
-console.log(__dirname);
-app.use(express.static(path.join(__dirname, '../../html')));
+app.use(express.static(path.join(__dirname, './tBook')));
 
 app.listen(8080);

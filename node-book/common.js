@@ -136,7 +136,7 @@ const getAlbum = (req, res) => {
 };
 
 const loadList = (cb) => {
-  fs.readdir(dirName, (err, files) => {
+  fs.readdir(path.resolve(__dirname, dirName), (err, files) => {
     if (err) {
       cb(makeError('file error', JSON.stringify(err)));
       return;
@@ -147,7 +147,7 @@ const loadList = (cb) => {
         cb(null, dirs);
         return;
       }
-      fs.stat(`${dirName}/${files[index]}`, (err, stats) => {
+      fs.stat(`${path.resolve(__dirname, dirName)}/${files[index]}`, (err, stats) => {
         if (err) {
           cb(makeError('file error', JSON.stringify(err)));
           return;

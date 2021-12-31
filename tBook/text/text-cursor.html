@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text-Cursor</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="980" height="640"></canvas>
+    <script src="./TextCursor.js"></script>
+    <script src="../tools.js"></script>
+
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const cursor = new TextCursor();
+      let drawingSurfaceImageData;
+      let blinkingInterval;
+      const BLINK_ON = 500;
+      const BLINK_OFF = 500;
+
+      function saveDrawingSurfaceData() {
+        drawingSurfaceImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      }
+
+      function moveCursor(loc) {
+        cursor.erase(context, drawingSurfaceImageData);
+        cursor.draw(context, loc.x, loc.y);
+      }
+
+      function blinkCursor(loc) {
+        blinkingInterval = setInterval(function () {
+          cursor.erase(context, drawingSurfaceImageData);
+          setTimeout(function () {
+            cursor.draw(context, cursor.left, cursor.top + cursor.getHeight(context));
+          }, BLINK_ON);
+        }, BLINK_ON + BLINK_OFF);
+      }
+
+      canvas.onmousedown = function (e) {
+        var loc = windowToCanvas(e);
+        moveCursor(loc);
+        if (!blinkingInterval) {
+          blinkCursor(loc);
+        }
+      };
+
+      drawGrid('lightgray', 20, 20);
+      saveDrawingSurfaceData();
+    </script>
+  </body>
+</html>
