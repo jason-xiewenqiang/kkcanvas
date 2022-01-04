@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>图像放大镜</title>
+  </head>
+  <body>
+    <img src="../fj.jpeg" />
+    <button id="btn1">负片滤镜</button>
+    <button id="btn2">黑白滤镜</button>
+    <canvas id="1" width="400" height="600"></canvas>
+    <canvas id="2" width="400" height="600"></canvas>
+    <script>
+      const canvas1 = document.getElementById('1');
+      const context1 = canvas1.getContext('2d');
+      const image1 = new Image();
+      const canvas2 = document.getElementById('2');
+      const context2 = canvas2.getContext('2d');
+      const image2 = new Image();
+      const btn1 = document.getElementById('btn1');
+      const btn2 = document.getElementById('btn2');
+
+      image1.src = '../fj.jpeg';
+      image1.onload = function () {
+        context1.drawImage(image1, 0, 0, canvas1.width, canvas1.height);
+      };
+
+      btn1.onclick = function () {
+        let imageData = context1.getImageData(0, 0, canvas1.width, canvas1.height);
+        let data = imageData.data;
+        for (let i = 0; i < data.length - 4; i += 4) {
+          data[i] = 255 - data[i];
+          data[i + 1] = 255 - data[i + 1];
+          data[i + 2] = 255 - data[i + 2];
+        }
+        context1.putImageData(imageData, 0, 0);
+      };
+
+      btn2.onclick = function () {
+        let data;
+        let i = 0;
+        let imageData = context2.getImageData(0, 0, canvas2.width, canvas2.height);
+        data = imageData.data;
+        for (i = 0; i < data.length - 4; i += 4) {
+          const average = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          data[i] = average;
+          data[i + 1] = average;
+          data[i + 2] = average;
+        }
+        context2.putImageData(imageData, 0, 0);
+      };
+
+      image2.src = '../fj.jpeg';
+      image2.onload = function () {
+        context2.drawImage(image2, 0, 0, canvas2.width, canvas2.height);
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>图像</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const image = new Image();
+      image.src = '../pig.jpeg';
+      image.onload = function () {
+        context.drawImage(image, 0, 0);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        console.log(imageData);
+      };
+    </script>
+  </body>
+</html>

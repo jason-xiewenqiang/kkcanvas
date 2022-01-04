@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>图像放大镜</title>
+  </head>
+  <body>
+    <button id="btn">浮雕</button>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const image = new Image();
+      const btn = document.getElementById('btn');
+      let emboos = false;
+
+      function drawOriginImage() {
+        context.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+      }
+
+      function drawEmboss() {
+        let imageData;
+        let data;
+        let length;
+        let width;
+        let height;
+
+        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        data = imageData.data;
+        width = imageData.width;
+        height = imageData.height;
+        length = data.length;
+
+        for (let i = 0; i < length; i++) {
+          if (i <= length - width * 4) {
+            if ((i + 1) % 4 !== 0) {
+              if ((i + 4) % (width * 4) == 0) {
+                data[i] = data[i - 4];
+                data[i + 1] = data[i - 3];
+                data[i + 2] = data[i - 2];
+                data[i + 3] = data[i - 1];
+                i += 4;
+              } else {
+                data[i] = 255 / 2 + 2 * data[i] - data[i + 4];
+              }
+            }
+          } else {
+            if ((i + 1) % 4 !== 0) {
+              data[i] = data[i - width * 4];
+            }
+          }
+        }
+        context.putImageData(imageData, 0, 0);
+      }
+
+      btn.onclick = function () {
+        if (emboos) {
+          emboos = false;
+          drawOriginImage();
+        } else {
+          drawEmboss();
+          emboos = true;
+        }
+      };
+
+      image.src = '../fj.jpeg';
+      image.onload = function () {
+        drawOriginImage();
+      };
+    </script>
+  </body>
+</html>

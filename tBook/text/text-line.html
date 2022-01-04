@@ -7,7 +7,40 @@
     <title>TextLine</title>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    字体
+    <select id="fontSelect">
+      <option value="SimSun" selected>SimSun</option>
+      <option value="SimHei">SimHei</option>
+      <option value="Microsoft YaHei">Microsoft YaHei</option>
+      <option value="MingLiU">MingLiU</option>
+      <option value="FangSong">FangSong</option>
+    </select>
+    字号
+    <select id="sizeSelect">
+      <option value="12" selected>12</option>
+      <option value="32">32</option>
+      <option value="16">16</option>
+      <option value="18">18</option>
+      <option value="24">24</option>
+    </select>
+    描边
+    <select id="strokeStyleSelect">
+      <option value="red" selected>red</option>
+      <option value="green">Green</option>
+      <option value="gray">gray</option>
+      <option value="#333">#333</option>
+      <option value="#f8f8f8">#f8f8f8</option>
+    </select>
+    填充
+    <select id="fillStyleSelect">
+      <option value="red" selected>red</option>
+      <option value="green">Green</option>
+      <option value="gray">gray</option>
+      <option value="#333">#333</option>
+      <option value="#f8f8f8">#f8f8f8</option>
+    </select>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
     <script src="./TextCursor.js"></script>
     <script src="./TextLine.js"></script>
     <script src="../tools.js"></script>
@@ -16,7 +49,7 @@
       const canvas = document.getElementById('canvas');
       const context = canvas.getContext('2d');
       const fontSelect = document.getElementById('fontSelect');
-      const sizeSlect = document.getElementById('sizeSelect');
+      const sizeSelect = document.getElementById('sizeSelect');
       const strokeStyleSelect = document.getElementById('strokeStyleSelect');
       const fillStyleSelect = document.getElementById('fillStyleSelect');
       const GRID_STROKE_STYLE = 'lightgray';
@@ -27,6 +60,100 @@
       let blinkingIntercal;
       const BLINK_TIME = 1000;
       const BLINK_OFF = 300;
+      let drawingSurfaceImageData;
+
+      // drawBackground();
+
+      // function windowToCanvas() {}
+
+      function saveDrawingSurface() {
+        drawingSurfaceImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      }
+
+      function setFont() {
+        context.font = `${sizeSelect.value}px ${fontSelect.value}`;
+      }
+
+      function blinkCursor(x, y) {
+        clearInterval(blinkingIntercal);
+        blinkingIntercal = setInterval(function (e) {
+          cursor.erase(context, drawingSurfaceImageData);
+          setTimeout(function (e) {
+            if (cursor.left == x && cursor.top + cursor.getHeight(context) == y) {
+              cursor.draw(context, x, y);
+            }
+          }, 300);
+        }, 1000);
+      }
+      function moveCursor(x, y) {
+        cursor.erase(context, drawingSurfaceImageData);
+        saveDrawingSurface();
+        context.putImageData(drawingSurfaceImageData, 0, 0);
+        cursor.draw(context, x, y);
+        blinkCursor(x, y);
+      }
+
+      canvas.onmousedown = function (e) {
+        let loc = windowToCanvas(e);
+        let fontHeight = context.measureText('W').width;
+        fontHeight += fontHeight / 6;
+        line = new TextLine(loc.x, loc.y);
+        moveCursor(loc.x, loc.y);
+      };
+
+      fillStyleSelect.onchange = function () {
+        cursor.fillStyle = fillStyleSelect.value;
+        context.fillStyle = fillStyleSelect.value;
+      };
+      strokeStyleSelect.onchange = function () {
+        cursor.strokeStyle = strokeStyleSelect.value;
+        context.strokeStyle = strokeStyleSelect.value;
+      };
+
+      document.onkeydown = function (e) {
+        if (e.keyCode === 8 || e.keyCode === 13) {
+          e.preventDefault();
+        }
+        if (e.keyCode === 8) {
+          context.save();
+          line.erase(context, drawingSurfaceImageData);
+          line.removeCharacterBeforeCaret();
+          moveCursor(line.left + line.getWidth(context), line.bottom);
+          line.draw(context);
+          context.restore();
+        }
+      };
+      document.onkeypress = function (e) {
+        let key = String.fromCharCode(e.which);
+        if (e.keyCode !== 8 && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          context.save();
+          line.erase(context, drawingSurfaceImageData);
+          line.insert(key);
+
+          moveCursor(line.left + line.getWidth(context), line.bottom);
+          context.shadowColor = 'rgba(0,0,0,0.5)';
+          context.shadowOffsetX = 1;
+          context.shadowOffsetY = 1;
+          context.shadowBlur = 2;
+          line.draw(context);
+          context.restore();
+        }
+      };
+
+      fontSelect.onchange = setFont;
+      sizeSelect.onchange = setFont;
+
+      cursor.fillStyle = fillStyleSelect.value;
+      context.fillStyle = fillStyleSelect.value;
+      cursor.strokeStyle = strokeStyleSelect.value;
+      context.strokeStyle = strokeStyleSelect.value;
+
+      context.lineWidth = 2;
+
+      setFont();
+      drawBackgroud();
+      saveDrawingSurface();
     </script>
   </body>
 </html>
