@@ -15,6 +15,10 @@ function drawGrid(color, stepx, stepy) {
   }
 }
 
+function eraseBackground() {
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+}
+
 function drawBackgroud() {
   const STEP_Y = 12;
   const TOP_MARGIN = STEP_Y * 4;
@@ -45,4 +49,21 @@ function windowToCanvas(e) {
     x: e.clientX - bbox.left * (canvas.width / bbox.width),
     y: e.clientY - bbox.top * (canvas.height / bbox.height),
   };
+}
+
+function getAnimateFrame() {
+  return (
+    window.requestAnimationFrame ||
+    function (callback, element) {
+      const self = this;
+      let start;
+      let finish;
+      setTimeout(function () {
+        start = +new Date();
+        callback(start);
+        finish = +new Date();
+        self.timeout = 1000 / 60 - (finish - start);
+      }, self.start);
+    }
+  );
 }

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>clip</title>
+  </head>
+  <body>
+    <button id="btn">淡出</button>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const image = new Image();
+      const btn = document.getElementById('btn');
+      let originalImageData = null;
+      let interval = null;
+
+      function increaseTransparentcy(imagedata, steps) {
+        let alpha;
+        let currentAlpha;
+        let step;
+        let length = imagedata.data.length;
+        for (let i = 3; i < length; i += 4) {
+          alpha = originalImageData.data[i];
+          if (alpha > 0 && imagedata.data[i] > 0) {
+            currentAlpha = imagedata.data[i];
+            step = Math.ceil(alpha / steps);
+            if (currentAlpha - step > 0) {
+              imagedata.data[i] -= step;
+            } else {
+              imagedata.data[i] = 0;
+            }
+          }
+        }
+      }
+
+      function fadeOut(context, imagedata, x, y, steps, millisecondsPerStep) {
+        let frame = 0;
+        let length = imagedata.data.length;
+        interval = setInterval(function () {
+          frame++;
+          if (frame > steps) {
+            clearInterval(interval);
+            anmiationComplete();
+          } else {
+            increaseTransparentcy(imagedata, steps);
+            context.putImageData(imagedata, x, y);
+          }
+        }, millisecondsPerStep);
+      }
+
+      function anmiationComplete() {
+        setTimeout(function () {
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }, 1000);
+      }
+
+      btn.onclick = function () {
+        fadeOut(context, context.getImageData(0, 0, canvas.width, canvas.height), 0, 0, 20, 100 / 60);
+      };
+
+      image.src = '../fj.jpeg';
+      image.onload = function () {
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      };
+    </script>
+  </body>
+</html>

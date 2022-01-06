@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>requestAnimationFrame</title>
+    <style>
+      body {
+        background-color: #ddd;
+      }
+      #canvas {
+        background-color: #fff;
+        cursor: pointer;
+        margin-left: 10px;
+        margin-top: 10px;
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+      }
+      #controls {
+        margin-top: 10px;
+        margin-left: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <input id="animatebutton" type="button" value="Animate" />
+    </div>
+    <canvas id="canvas" width="1024" height="512"></canvas>
+    <script src="../tools.js"></script>
+    <script>
+      const btn = document.getElementById('animatebutton');
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const sky = new Image();
+      let paused = false;
+      let lastTime = 0;
+      const SKY_VELOCITY = 30;
+      let skyOffset = 0;
+      let fps = 0;
+      let now = +new Date();
+
+      function erase() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function draw() {
+        context.save();
+        skyOffset = skyOffset < canvas.width ? skyOffset + SKY_VELOCITY / fps : 0;
+        context.save();
+        context.translate(-skyOffset, 0);
+        context.drawImage(sky, 0, 0);
+        context.drawImage(sky, sky.width - 2, 0);
+        context.restore();
+      }
+
+      function calculateFps(now) {
+        const fps = 1000 / (now - lastTime);
+        lastTime = now;
+        return fps;
+      }
+
+      function animate(time) {
+        if (time === undefined) {
+          time = +new Date();
+        }
+        fps = calculateFps(time);
+        if (!paused) {
+          erase();
+          draw();
+        }
+        getAnimateFrame()(animate);
+      }
+
+      btn.onclick = function () {
+        paused = !paused;
+        if (paused) {
+          btn.value = 'Animate';
+        } else {
+          btn.value = 'Pause';
+        }
+      };
+
+      canvas.width = canvas.width;
+      canvas.height = canvas.height;
+      sky.src = '../cloud.jpeg';
+      sky.onload = function () {
+        draw();
+      };
+
+      getAnimateFrame()(animate);
+    </script>
+  </body>
+</html>

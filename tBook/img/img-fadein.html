@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fadeout</title>
+  </head>
+  <body>
+    <button id="btn">淡出</button>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+      const offscreenCanvas = document.createElement('canvas');
+      const offscreenContext = offscreenCanvas.getContext('2d');
+      const canvas = document.getElementById('canvas');
+      const btn = document.getElementById('btn');
+      const context = canvas.getContext('2d');
+      let originalImageData = null;
+      const image = new Image();
+      let interval = null;
+      let imageDataOffscreen;
+
+      function increaseTransparentcy(imagedata, steps) {
+        let alpha;
+        let currentAlpha;
+        let step;
+        let length = imagedata.data.length;
+        for (let i = 3; i < length; i += 4) {
+          alpha = imageDataOffscreen.data[i];
+          if (alpha > 0) {
+            currentAlpha = imagedata.data[i];
+            step = Math.ceil(alpha / steps);
+            if (currentAlpha + step <= alpha) {
+              imagedata.data[i] += step;
+            } else {
+              imagedata.data[i] = alpha;
+            }
+          }
+        }
+      }
+
+      function fadeIn(context, imagedata, steps, millisecondsPerStep) {
+        let frame = 0;
+        for (let i = 3; i < imagedata.data.length; i += 4) {
+          imagedata.data[i] = 0;
+        }
+        interval = setInterval(function () {
+          console.log(123);
+          frame++;
+          console.log('steps', frame, steps);
+          if (frame > steps) {
+            clearInterval(interval);
+            anmiationComplete();
+          } else {
+            increaseTransparentcy(imagedata, steps);
+            context.putImageData(imagedata, 0, 0);
+          }
+        }, millisecondsPerStep);
+      }
+
+      function fadeOut(context, imagedata, x, y, steps, millisecondsPerStep) {
+        let frame;
+        let length = imagedata.data.length;
+        interval = setInterval(function () {
+          frame++;
+          if (frame > steps) {
+            clearInterval(interval);
+            anmiationComplete();
+          } else {
+            increaseTransparentcy(imagedata, steps);
+            context.putImageData(imagedata, x, y);
+          }
+        }, millisecondsPerStep);
+      }
+
+      function anmiationComplete() {
+        setTimeout(function () {
+          // context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          context.clearRect(0, 0, canvas.width, canvas.height);
+        }, 1000);
+      }
+
+      btn.onclick = function () {
+        imageDataOffscreen = offscreenContext.getImageData(0, 0, canvas.width, canvas.height);
+        // fadeOut(context, context.getImageData(0, 0, canvas.width, canvas.height), 0, 0, 20, 100 / 60);
+        fadeIn(context, offscreenContext.getImageData(0, 0, canvas.width, canvas.height), 50, 1000 / 60);
+      };
+
+      image.src = '../fj.jpeg';
+      image.onload = function () {
+        offscreenCanvas.width = canvas.width;
+        offscreenCanvas.height = canvas.height;
+        offscreenContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+        // originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      };
+    </script>
+  </body>
+</html>
