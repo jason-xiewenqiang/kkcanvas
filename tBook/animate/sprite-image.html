@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sprite</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <script src="../tools.js"></script>
+    <script src="./sprite.js"></script>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const bomb = new Sprite('bomb', new ImagePainter('../man-2.png'));
+      const BOML_LEFT = 220;
+      const BOML_TOP = 80;
+      const BOML_WIDTH = 128;
+      const BOML_HEIGHT = 128;
+      function animate() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        bomb.paint(context);
+        window.requestAnimationFrame(animate);
+      }
+
+      bomb.left = BOML_LEFT;
+      bomb.top = BOML_TOP;
+      bomb.width = BOML_WIDTH;
+      bomb.height = BOML_HEIGHT;
+
+      window.requestAnimationFrame(animate);
+    </script>
+  </body>
+</html>

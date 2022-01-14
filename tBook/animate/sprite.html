@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sprite</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="1024" height="512"></canvas>
+    <script src="../tools.js"></script>
+    <script src="./sprite.js"></script>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const radius = 75;
+      const ball = new Sprite('ball', {
+        paint: function (sprite, context) {
+          context.beginPath();
+          context.arc(sprite.left + sprite.width / 2, sprite.top + sprite.height / 2, radius, 0, Math.PI * 2, false);
+          context.clip();
+          context.shadowColor = 'rgb(0,0,0)';
+          context.shadowOffsetX = -4;
+          context.shadowOffsetY = -4;
+          context.shadowBlur = 8;
+          context.lineWidth = 2;
+          context.strokeStyle = 'rgb(100, 100, 195)';
+          context.fillStyle = 'rgba(30, 144, 255, 0.15)';
+          context.fill();
+          context.stroke();
+        },
+      });
+      drawBackgroud('lightgray', 10, 10);
+      ball.left = 320;
+      ball.top = 160;
+      ball.paint(context);
+    </script>
+  </body>
+</html>
