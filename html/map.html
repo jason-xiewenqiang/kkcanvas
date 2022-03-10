@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>异步加载地图</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <style>
+    body,
+    html,
+    #container {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "微软雅黑";
+    }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+</body>
+</html>
+<script>
+function loadJScript() {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = '//api.map.baidu.com/api?type=webgl&v=1.0&ak=cGbrt66AlT0zbvb2Exi7GhTTysNNTYKf&callback=init';
+    document.body.appendChild(script);
+}
+getLocation(); 
+// H5获取当前位置
+function getLocation(){
+　　if (navigator.geolocation){
+　　　　navigator.geolocation.getCurrentPosition(showPosition,showError);
+　　}else{
+　　　　alert("浏览器不支持地理定位。");
+　　}
+}
+// 获取用户经纬度
+function showPosition(position){
+  console.log('...', position);
+　　//GPS经纬度
+　　let x = position.coords.latitude;
+　　let y = position.coords.longitude;
+}
+  // 报错信息
+function showError(error){
+	console.log(error)
+　　switch(error.code) {
+　　　　case error.PERMISSION_DENIED:
+　　　　　　alert("定位失败,用户拒绝请求地理定位");
+　　　　　　break;
+　　　　case error.POSITION_UNAVAILABLE:
+　　　　　　alert("定位失败,位置信息是不可用");
+　　　　　　break;
+　　　　case error.TIMEOUT:
+　　　　　　alert("定位失败,请求获取用户位置超时");
+　　　　　　break;
+　　　　case error.UNKNOWN_ERROR:
+　　　　　　alert("定位失败,定位系统失效");
+　　　　　　break;
+　　}
+}
+function init() {
+    var map = new BMapGL.Map('container'); // 创建Map实例
+  
+  var geoLocation = new BMapGL.Geolocation();
+  geoLocation.enableSDKLocation();
+  geoLocation.getCurrentPosition(function(r) {
+  	console.log(r);
+  })
+     function myFun(result){
+        console.dir(result);
+    }
+    var myCity = new BMapGL.LocalCity();
+    myCity.get(myFun);
+}
+    
+window.onload = loadJScript; // 异步加载地图
+</script>

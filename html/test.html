@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>浏览器精确定位</title>
+      <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <style>
+        html,body,#container{
+            height:100%;
+        }
+        .info{
+            width:26rem;
+        }
+    </style>
+<body>
+<div id='container'></div>
+<div class="info">
+    <h4 id='status'></h4><hr>
+    <p id='result'></p><hr>
+    <p >由于众多浏览器已不再支持非安全域的定位请求，为保位成功率和精度，请升级您的站点到HTTPS。</p>
+</div>
+<script type="text/javascript">
+        window._AMapSecurityConfig = {
+          securityJsCode:'43fd9fda65d0c5bff4176a65dba6d818',  
+        }
+
+  var GPS = {
+  PI: 3.14159265358979324,
+  x_pi: (3.14159265358979324 * 3000.0) / 180.0,
+  delta: function (lat, lon) {
+    var a = 6378245.0; //  a: 卫星椭球坐标投影到平面地图坐标系的投影因子。
+
+    var ee = 0.00669342162296594323; //  ee: 椭球的偏心率。
+
+    var dLat = this.transformLat(lon - 105.0, lat - 35.0);
+
+    var dLon = this.transformLon(lon - 105.0, lat - 35.0);
+
+    var radLat = (lat / 180.0) * this.PI;
+
+    var magic = Math.sin(radLat);
+
+    magic = 1 - ee * magic * magic;
+
+    var sqrtMagic = Math.sqrt(magic);
+
+    dLat = (dLat * 180.0) / (((a * (1 - ee)) / (magic * sqrtMagic)) * this.PI);
+
+    dLon = (dLon * 180.0) / ((a / sqrtMagic) * Math.cos(radLat) * this.PI);
+
+    return {
+      lat: dLat,
+      lon: dLon,
+    };
+  },
+
+  //WGS-84 to GCJ-02
+
+  gcj_encrypt: function (wgsLat, wgsLon) {
+    if (this.outOfChina(wgsLat, wgsLon))
+      return {
+        lat: wgsLat,
+
+        lon: wgsLon,
+      };
+
+    var d = this.delta(wgsLat, wgsLon);
+
+    return {
+      lat: wgsLat + d.lat,
+
+      lon: wgsLon + d.lon,
+    };
+  },
+
+  outOfChina: function (lat, lon) {
+    if (lon < 72.004 || lon > 137.8347) return true;
+
+    if (lat < 0.8293 || lat > 55.8271) return true;
+
+    return false;
+  },
+  transformLat: function (x, y) {
+    var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
+
+    ret += ((20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0) / 3.0;
+
+    ret += ((20.0 * Math.sin(y * this.PI) + 40.0 * Math.sin((y / 3.0) * this.PI)) * 2.0) / 3.0;
+
+    ret += ((160.0 * Math.sin((y / 12.0) * this.PI) + 320 * Math.sin((y * this.PI) / 30.0)) * 2.0) / 3.0;
+
+    return ret;
+  },
+
+  transformLon: function (x, y) {
+    var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
+
+    ret += ((20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0) / 3.0;
+
+    ret += ((20.0 * Math.sin(x * this.PI) + 40.0 * Math.sin((x / 3.0) * this.PI)) * 2.0) / 3.0;
+
+    ret += ((150.0 * Math.sin((x / 12.0) * this.PI) + 300.0 * Math.sin((x / 30.0) * this.PI)) * 2.0) / 3.0;
+
+    return ret;
+  },
+};
+</script>
+<script src="https://unpkg.com/gcoord/dist/gcoord.js"></script>
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=b4ecaeb3298c62fdfffe8eef98394613"></script>
+<script type="text/javascript">
+  var map = new AMap.Map('container', {
+        resizeEnable: true
+    });
+    AMap.plugin('AMap.Geolocation', function() {
+        var geolocation = new AMap.Geolocation({
+            enableHighAccuracy: false,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：5s
+                      buttonPosition:'RB',    //定位按钮的停靠位置
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,   //定位成功后是否自动调整地图视野到定位点
+            useNative: true
+        });
+        geolocation.getCurrentPosition(function(status,result){
+            if(status=='complete'){
+              console.log(result.position)
+                onComplete(result)
+            }else{
+                onError(result)
+            }
+        });
+    });
+    //解析定位结果
+    function onComplete(data) {
+      console.log(data)
+      getAddress(data.position)
+    }
+  
+function getAddress (position) {
+  var result = gcoord.transform(
+    [position.getLat(), position.getLng()],    // 经纬度坐标
+    gcoord.WGS84,                 // 当前坐标系
+    gcoord.GCJ02                  // 目标坐标系
+) ;
+console.log('testt', result );
+  AMap.plugin('AMap.Geocoder', function() {
+    var geocoder = new AMap.Geocoder({ city: "010" });
+    regeoCode(position, geocoder);
+  })
+  function regeoCode(lnglat, geocoder) {
+      geocoder.getAddress(lnglat, function(status, result) {
+        if (status === 'complete') {
+          var address = result.regeocode.formattedAddress;
+          console.log(address, result)
+        }else{
+          console.log('根据经纬度查询地址失败')
+        }
+      });
+    }
+}
+    //解析定位错误信息
+    function onError(data) {
+        document.getElementById('status').innerHTML='定位失败'
+        document.getElementById('result').innerHTML = '失败原因排查信息:'+data.message;
+    }
+
+</script>
+</body>
+</html>
